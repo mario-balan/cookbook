@@ -1,0 +1,11 @@
+making repositories from subdirectories of other repos seems to be a task that will need to be done again in the near future.
+
+so this is how I did to detach sicp-exercises from coursework:
+
+git clone coursework sicp-exercises
+git remote set-url origin https://github.com/mario-balan/sicp-exercises.git
+git filter-branch --tag-name-filter cat --prune-empty --subdirectory-filter teachyourselfcs/programming -- --all
+git reset --hard
+git for-each-ref --format="%(refname)" refs/original/ | xargs -n 1 git update-ref -d
+git reflog expire --expire=now --all
+git gc --aggressive --prune=now
