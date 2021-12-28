@@ -8,6 +8,7 @@ class Switchable(ABC):
     def turn_on(self):
         pass
     
+    @abstractmethod
     def turn_off(self):
         pass
 
@@ -29,7 +30,6 @@ class Microwave(Switchable):
 
 
 class ElectricPowerSwitch:
-
     def __init__(self, c: Switchable):
         self.client = c
         self.on = False
