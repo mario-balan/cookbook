@@ -1,6 +1,6 @@
 import string
 import random
-from typing import List
+from typing import List, Callable
 from abc import ABC, abstractclassmethod, abstractmethod
 
 def generate_id(length=8):
@@ -16,34 +16,21 @@ class SupportTicket:
         self.issue = issue
 
 
-class TicketOrderingStrategy(ABC):
-    @abstractmethod
-    def create_ordering(self, list: List[SupportTicket]) -> List[SupportTicket]:
-        pass
-
-
-class FIFOOrderingStrategy(TicketOrderingStrategy):
-    def create_ordering(self, list: List[SupportTicket]) -> List[SupportTicket]:
-        return list.copy()
+def fifo_ordering(list) -> List[SupportTicket]:
+    return list.copy()
     
+def filo_ordering(list: List[SupportTicket]) -> List[SupportTicket]:
+    list_copy = list.copy()
+    list_copy.reverse()
+    return list_copy
 
-class FILOOrderingStrategy(TicketOrderingStrategy):
-    def create_ordering(self, list: List[SupportTicket]) -> List[SupportTicket]:
-        list_copy = list.copy()
-        list_copy.reverse()
-        return list_copy
+def random_ordering(list: List[SupportTicket]) -> List[SupportTicket]:
+    list_copy = list.copy()
+    random.shuffle(list_copy)
+    return list_copy
 
-
-class RandomOrderingStrategy(TicketOrderingStrategy):
-    def create_ordering(self, list: List[SupportTicket]) -> List[SupportTicket]:
-        list_copy = list.copy()
-        random.shuffle(list_copy)
-        return list_copy
-
-# adding a new ordering strategy becomes easier
-class BlackHoleOrderingStrategy(TicketOrderingStrategy):
-    def create_ordering(self, list: List[SupportTicket]) -> List[SupportTicket]:
-        return []
+def black_hole_ordering(list: List[SupportTicket]) -> List[SupportTicket]:
+    return []
 
 
 class CustomerSupport:
@@ -52,9 +39,9 @@ class CustomerSupport:
     def create_ticket(self, customer, issue):
         self.tickets.append(SupportTicket(customer, issue))
 
-    def process_tickets(self, processing_strategy: TicketOrderingStrategy):
+    def process_tickets(self, processing_strategy: Callable[[List[SupportTicket]],List[SupportTicket]]):
         # create an ordered list
-        ticket_list = processing_strategy.create_ordering(self, self.tickets)
+        ticket_list = processing_strategy(self.tickets)
 
         # if it's empty, don't do anything
         if len(ticket_list) == 0:
@@ -81,4 +68,4 @@ app.create_ticket("Linus Sebastian", "I can't upload any videos, please help.")
 app.create_ticket("Arjan Egges", "VSCode doesn't automatically solve my bugs.")
 
 # process the tickets
-app.process_tickets(BlackHoleOrderingStrategy)
+app.process_tickets(black_hole_ordering)
